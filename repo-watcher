@@ -8,7 +8,7 @@ api() {
 fetch_info() {
   api "https://api.github.com/repos/$1/$2" |
     sed -n 's/"stargazers_count": \([0-9]*\),$/\1/p' |
-    tr -d '[[:space:]]'
+    tr -d '[:space:]'
 }
 
 local_info() {
@@ -18,10 +18,11 @@ local_info() {
 }
 
 process() {
-  local user="$1"
-  local repo="$2"
-  local current_stars="$(fetch_info $user $repo)"
-  local previous_stars="$(local_info $user $repo)"
+  local user repo current_stars previous_stars
+  user="$1"
+  repo="$2"
+  current_stars="$(fetch_info "$user" "$repo")"
+  previous_stars="$(local_info "$user" "$repo")"
   test -z "$previous_stars" && previous_stars="0"
   test -z "$current_stars" && echo "Failed to get current stars." && exit 1
   test "$current_stars" != "$previous_stars" &&
@@ -33,6 +34,6 @@ process() {
   fi
 }
 
-grep -v "^#" repos | while read -r user repo; do
-  process $user $repo
+grep -e "^\w" repos | while read -r user repo; do
+  process "$user" "$repo"
 done
