@@ -28,7 +28,7 @@ process() {
   test "$current_stars" != "$previous_stars" &&
     echo "$user/$repo from $previous_stars to $current_stars stars"
   if test -s stars && grep "$user $repo" stars &> /dev/null; then
-    sed -i'' -e "s/$user $repo [0-9]*/$user $repo $current_stars/" stars
+    sed -i -e "s/$user $repo [0-9]*/$user $repo $current_stars/" stars
   else
     echo "$user $repo $current_stars" >> stars
   fi
