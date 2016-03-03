@@ -14,6 +14,10 @@ pretty_date() {
 process() {
   # shellcheck disable=SC2039
   local user="$1" repo="$2" data dates first last
+  if ! grep -e "$user $repo" "$STARS" > /dev/null 2>&1; then
+    echo "No data found for $user $repo" >&2
+    return 1
+  fi
   data="$(grep "$user $repo" "$STARS")"
   dates="$(echo "$data" | awk '{print $1}')"
   first="$(pretty_date "$(echo "$dates" | head -n1)")"
