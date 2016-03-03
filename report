@@ -13,7 +13,7 @@ pretty_date() {
 process() {
   # shellcheck disable=SC2039
   local user="$1" repo="$2" data dates first last
-  data="$(grep "$user $repo" stars.txt)"
+  data="$(grep "$user $repo" "$STARS")"
   dates="$(echo "$data" | awk '{print $1}')"
   first="$(pretty_date "$(echo "$dates" | head -n1)")"
   last="$(pretty_date "$(echo "$dates" | tail -n1)")"
@@ -25,7 +25,7 @@ process() {
 if [ $# -eq 2 ]; then
   process "$1" "$2"
 else
-  grep -e "^\w" repos.txt | while read -r user repo; do
+  grep -e "^\w" "$REPOS" | while read -r user repo; do
     process "$user" "$repo"
   done
 fi

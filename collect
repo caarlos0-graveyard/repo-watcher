@@ -8,30 +8,28 @@ fetch_info() {
 }
 
 local_info() {
-  if ! grep -e "$1 $2" stars.txt > /dev/null 2>&1; then
+  if ! grep -e "$1 $2" "$STARS" > /dev/null 2>&1; then
     echo 0
   else
-    grep -e "$1 $2" stars.txt |
+    grep -e "$1 $2" "$STARS" |
       awk '{print $4}'
   fi
 }
 
 process() {
   # shellcheck disable=SC2039
-  local user repo current_stars previous_stars
-  user="$1"
-  repo="$2"
+  local user="$1" repo="$2" current_stars previous_stars
   current_stars="$(fetch_info "$user" "$repo")"
   previous_stars="$(local_info "$user" "$repo" | tail -n1)"
   if [ -z "$current_stars" ]; then
     echo "Failed to get current stars for $user $repo." >&2
     exit 1
   fi
-  echo "$(date +"$DATE_FORMAT") $user $repo $current_stars" >> stars.txt
+  echo "$(date +"$DATE_FORMAT") $user $repo $current_stars" >> "$STARS"
   test "$previous_stars" != "$current_stars" &&
     echo "$user $repo went from $previous_stars to $current_stars"
 }
 
-grep -e "^\w" repos.txt | while read -r user repo; do
+grep -e "^\w" "$REPOS" | while read -r user repo; do
   process "$user" "$repo"
 done

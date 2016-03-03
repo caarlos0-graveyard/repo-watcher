@@ -1,5 +1,7 @@
 #!/bin/sh
 export DATE_FORMAT="%Y%m%d%H%M%S"
+export REPOS="repos.txt"
+export STARS="stars.txt"
 api() {
   if [ -z "$GITHUB_TOKEN" ]; then
     curl -s "$1"
