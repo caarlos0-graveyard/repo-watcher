@@ -1,0 +1,31 @@
+#!/bin/sh
+. _lib.sh
+
+if ! spark > /dev/null 2>&1; then
+  echo "You need `spark` installed and in your PATH to use this." >&2
+  exit 1
+fi
+
+pretty_date() {
+  date -j -f "$DATE_FORMAT" "$1" +'%F %T'
+}
+
+process() {
+  # shellcheck disable=SC2039
+  local user="$1" repo="$2" data dates first last
+  data="$(grep "$user $repo" stars.txt)"
+  dates="$(echo "$data" | awk '{print $1}')"
+  first="$(pretty_date "$(echo "$dates" | head -n1)")"
+  last="$(pretty_date "$(echo "$dates" | tail -n1)")"
+  printf "\n\033[1m%s/%s\e[0m\n\e[90m%s - %s\e[0m\n" \
+    "$user" "$repo" "$first" "$last"
+  echo "$data" | awk '{print $4}' | spark
+}
+
+if [ $# -eq 2 ]; then
+  process "$1" "$2"
+else
+  grep -e "^\w" repos.txt | while read -r user repo; do
+    process "$user" "$repo"
+  done
+fi

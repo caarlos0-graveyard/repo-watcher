@@ -1,11 +1,5 @@
-#!/bin/bash
-api() {
-  if [ -z "$GITHUB_TOKEN" ]; then
-    curl -s "$1"
-  else
-    curl -H "Authorization: Bearer $GITHUB_TOKEN" -s "$1"
-  fi
-}
+#!/bin/sh
+. _lib.sh
 
 fetch_info() {
   api "https://api.github.com/repos/$1/$2" |
@@ -18,22 +12,22 @@ local_info() {
     echo 0
   else
     grep -e "$1 $2" stars.txt |
-      tail -n1 |
       awk '{print $4}'
   fi
 }
 
 process() {
+  # shellcheck disable=SC2039
   local user repo current_stars previous_stars
   user="$1"
   repo="$2"
   current_stars="$(fetch_info "$user" "$repo")"
-  previous_stars="$(local_info "$user" "$repo")"
+  previous_stars="$(local_info "$user" "$repo" | tail -n1)"
   if [ -z "$current_stars" ]; then
     echo "Failed to get current stars for $user $repo." >&2
     exit 1
   fi
-  echo "$(date +'%Y%m%d%H%M%S') $user $repo $current_stars" >> stars.txt
+  echo "$(date +"$DATE_FORMAT") $user $repo $current_stars" >> stars.txt
   test "$previous_stars" != "$current_stars" &&
     echo "$user $repo went from $previous_stars to $current_stars"
 }
