@@ -4,7 +4,7 @@
 [tp]: https://travis-ci.org/caarlos0/repo-watcher
 
 > Watches repositories star counts, so you can see how it evolves
-(and graph it!).
+(and graph it!) :star:.
 
 I use this script to periodically check how my repos are evolving in a star
 number sense.
@@ -40,3 +40,11 @@ uses spark to plot graphs right on your terminal:
 ![screenshot][scrn]
 
 [scrn]: https://raw.githubusercontent.com/caarlos0/repo-watcher/master/imgs/01.png
+
+You can put `collect` in your crontab, so it get's run every `x` time:
+
+```crontab
+0 * * * * (cd /path/to/repo-watcher; ./collect)
+```
+
+Well, at least, that's what I do :rocket:
