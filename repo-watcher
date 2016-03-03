@@ -1,8 +1,10 @@
 #!/bin/bash
 api() {
-  test -z "$GITHUB_TOKEN" && curl -s "$1"
-  test -n "$GITHUB_TOKEN" &&
+  if [ -z "$GITHUB_TOKEN" ]; then
+    curl -s "$1"
+  else
     curl -H "Authorization: Bearer $GITHUB_TOKEN" -s "$1"
+  fi
 }
 
 fetch_info() {
@@ -12,9 +14,13 @@ fetch_info() {
 }
 
 local_info() {
-  test -s stars || return 0
-  grep -e "$1\s*$2" stars |
-    awk '{print $3}'
+  if ! grep -e "$1 $2" stars.txt > /dev/null 2>&1; then
+    echo 0
+  else
+    grep -e "$1 $2" stars.txt |
+      tail -n1 |
+      awk '{print $4}'
+  fi
 }
 
 process() {
@@ -23,17 +29,15 @@ process() {
   repo="$2"
   current_stars="$(fetch_info "$user" "$repo")"
   previous_stars="$(local_info "$user" "$repo")"
-  test -z "$previous_stars" && previous_stars="0"
-  test -z "$current_stars" && echo "Failed to get current stars." && exit 1
-  test "$current_stars" != "$previous_stars" &&
-    echo "$user/$repo from $previous_stars to $current_stars stars"
-  if test -s stars && grep "$user $repo" stars &> /dev/null; then
-    sed -i -e "s/$user $repo [0-9]*/$user $repo $current_stars/" stars
-  else
-    echo "$user $repo $current_stars" >> stars
+  if [ -z "$current_stars" ]; then
+    echo "Failed to get current stars for $user $repo." >&2
+    exit 1
   fi
+  echo "$(date +'%Y%m%d%H%M%S') $user $repo $current_stars" >> stars.txt
+  test "$previous_stars" != "$current_stars" &&
+    echo "$user $repo went from $previous_stars to $current_stars"
 }
 
-grep -e "^\w" repos | while read -r user repo; do
+grep -e "^\w" repos.txt | while read -r user repo; do
   process "$user" "$repo"
 done
