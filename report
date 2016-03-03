@@ -3,7 +3,7 @@
 . _lib.sh
 
 if ! spark > /dev/null 2>&1; then
-  echo "You need `spark` installed and in your PATH to use this." >&2
+  echo "You need 'spark' installed and in your PATH to use this." >&2
   exit 1
 fi
 
