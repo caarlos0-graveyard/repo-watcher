@@ -13,17 +13,20 @@ pretty_date() {
 
 process() {
   # shellcheck disable=SC2039
-  local user="$1" repo="$2" data dates first last
+  local user="$1" repo="$2" data dates points first_date last_date first last
   if ! grep -e "$user $repo" "$STARS" > /dev/null 2>&1; then
     echo "No data found for $user $repo" >&2
     return 1
   fi
   data="$(grep "$user $repo" "$STARS")"
   dates="$(echo "$data" | awk '{print $1}')"
-  first="$(pretty_date "$(echo "$dates" | head -n1)")"
-  last="$(pretty_date "$(echo "$dates" | tail -n1)")"
-  printf "\n\033[1m%s/%s\e[0m\n\e[90m%s - %s\e[0m\n" \
-    "$user" "$repo" "$first" "$last"
+  points="$(echo "$data" | awk '{print $4}')"
+  first_date="$(pretty_date "$(echo "$dates" | head -n1)")"
+  last_date="$(pretty_date "$(echo "$dates" | tail -n1)")"
+  first="$(echo "$points" | head -n1)"
+  last="$(echo "$points" | tail -n1)"
+  printf "\n\033[1m%s/%s\e[0m\n\e[90m(%s) %s - %s (%s)\e[0m\n" \
+    "$user" "$repo" "$first_date" "$first" "$last" "$last_date"
   echo "$data" | awk '{print $4}' | spark
 }
 
