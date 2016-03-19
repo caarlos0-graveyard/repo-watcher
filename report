@@ -27,7 +27,7 @@ process() {
   last="$(echo "$points" | tail -n1)"
   printf "\n\033[1m%s/%s\e[0m\n\e[90m(%s) %s - %s (%s)\e[0m\n" \
     "$user" "$repo" "$first_date" "$first" "$last" "$last_date"
-  echo "$data" | awk '{print $4}' | spark
+  echo "$data" | awk '{print $4}' | awk '!x[$0]++' | spark
 }
 
 if [ $# -eq 2 ]; then
