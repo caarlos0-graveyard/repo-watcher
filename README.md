@@ -1,3 +1,7 @@
+> This repo is now inactive.
+>
+> Please check http://watchub.pw (is basically this service as a service :beer:).
+
 # repo-watcher [![Build Status][tb]][tp]
 
 [tb]: https://img.shields.io/travis/caarlos0/repo-watcher/master.svg?style=flat-square
